@@ -1,6 +1,5 @@
 .venv/*
 data/*
-!data/.gitkeep
 .idea/*
 __pycache__/*
 api-key.txt
