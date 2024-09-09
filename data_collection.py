@@ -25,6 +25,9 @@ def get_all_app_ids_and_names(print_endpoint: bool=False,
     :return: A list of dictionaries containing every app id and corresponding app name. The dictionaries have two
     keys: 'appid' and 'name'.
     """
+    # Create data directory if it doesn't exist
+    Path(config.DATA_DIRECTORY).mkdir(exist_ok=True)
+
     # If data file already exists and we are not overwriting, read file and return contents
     if not overwrite_existing_file and Path(config.STEAM_APP_JSON_DATA).is_file():
         with open(config.STEAM_APP_JSON_DATA, "r") as f:

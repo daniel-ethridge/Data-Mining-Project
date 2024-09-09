@@ -13,7 +13,7 @@ def create_csv_of_apps(steam_apps: list=None, block_size=1000, overwrite_file=Fa
     :param overwrite_file: If true, overwrite the existing file. Default False.
     """
     # If file already exists, and overwrite_file is False, do nothing
-    if Path(config.STEAM_APP_JSON_DATA).is_file() and not overwrite_file:
+    if Path(config.STEAM_APP_CSV_DATA).is_file() and not overwrite_file:
         print("File already exists. To overwrite, set 'overwrite_file' to 'False'.")
         return
 
