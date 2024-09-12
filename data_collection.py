@@ -1,0 +1,126 @@
+from pathlib import Path
+import requests
+import json
+import config
+
+
+def raise_api_error(function_name: str, status_code, reason):
+    """
+    Helper function for issuing warnings from failed API calls
+    :param function_name: Name of the function that calls this function
+    :param status_code: Status code returned from requests call
+    :param reason: Reason retured from request call
+    """
+    raise requests.RequestException(f"Failed API Call in '{function_name}'.\n"
+          f"API response code: {status_code}\n"
+          f"API error reason: {reason}")
+
+
+def get_all_app_ids_and_names(print_endpoint: bool=False,
+                              overwrite_existing_file=False):
+    """
+    Get a list of every app id and name. Write to file designated in config.STEAM_APP_JSON_DATA.
+    :param print_endpoint: If true, print full endpoint to console. Default False.
+    :param overwrite_existing_file: If True and <config.STEAM_APP_JSON_DATA> exists, overwrite that file. Default False.
+    :return: A list of dictionaries containing every app id and corresponding app name. The dictionaries have two
+    keys: 'appid' and 'name'.
+    """
+    # Create data directory if it doesn't exist
+    Path(config.DATA_DIRECTORY).mkdir(exist_ok=True)
+
+    # If data file already exists and we are not overwriting, read file and return contents
+    if not overwrite_existing_file and Path(config.STEAM_APP_JSON_DATA).is_file():
+        with open(config.STEAM_APP_JSON_DATA, "r") as f:
+            json_data = json.load(f)
+            print("Returning contents from existing file.")
+            return json_data["apps"]
+
+    # Make api
+    print("Making API request.")
+    response = requests.get("https://api.steampowered.com/ISteamApps/GetAppList/v2/")
+    if print_endpoint:
+        print(response.url)
+
+    # Check status
+    if response.status_code != 200:
+        raise_api_error("get_all_app_ids_and_names", response.status_code, response.reason)
+
+    # Write to file
+    if overwrite_existing_file or not Path(config.STEAM_APP_JSON_DATA).is_file():
+            with open(config.STEAM_APP_JSON_DATA, "w") as f:
+                json.dump(response.json()["applist"], f)
+                print("file written")
+
+    # Return resulting list
+    return response.json()["applist"]["apps"]
+
+
+def get_app_details(appid: str or int, print_endpoint: bool=False):
+    """
+    Get the details about a single app in a dictionary. Dictionary keys returned:
+    ['type', 'name', 'steam_appid', 'required_age', 'is_free', 'controller_support', 'dlc', 'detailed_description',
+    'about_the_game', 'short_description', 'supported_languages', 'reviews', 'header_image', 'capsule_image',
+    'capsule_imagev5', 'website', 'pc_requirements', 'mac_requirements', 'linux_requirements', 'legal_notice',
+    'developers', 'publishers', 'price_overview', 'packages', 'package_groups', 'platforms', 'metacritic',
+    'categories', 'genres', 'screenshots', 'movies', 'recommendations', 'achievements', 'release_date',
+    'support_info', 'background', 'background_raw', 'content_descriptors', 'ratings']
+    See https://github.com/Revadike/InternalSteamWebAPI/wiki/Get-App-Details for more information.
+    :param appid: A single Steam AppID as an integer or a string
+    :param print_endpoint: if True, print the API endpoint used in the request
+    :return: App details in JSON format
+    """
+    # Set parameters, make api call, and optionally print the endpoing
+    parameters = {"appids": appid}
+    response = requests.get("https://store.steampowered.com/api/appdetails", params=parameters)
+    if print_endpoint:
+        print(response.url)
+
+    # Throw error if the status code is not 200
+    if response.status_code != 200:
+        raise_api_error("get_app_details", response.status_code, response.reason)
+
+    # Return the JSON information
+    return response.json()[str(appid)]['data']
+
+
+def get_app_reviews(appid: str or int, print_endpoint: bool=False):
+    """
+    Get the reviews for a single app.
+    See https://github.com/Revadike/InternalSteamWebAPI/wiki/Get-App-Reviews
+    :param appid: A single Steam AppID as an integer or a string
+    :param print_endpoint: if True, print the API endpoint used in the request
+    :return: App details in JSON format
+    """
+    # Get the response and optionally print the full API endpoint
+    response = requests.get(f"https://store.steampowered.com/appreviews/{appid}?json=1")
+    if print_endpoint:
+        print(response.url)
+
+    # Check status code. Raise error if status code is not 200
+    if response.status_code != 200:
+        raise_api_error("get_app_reviews", response.status_code, response.reason)
+
+    # Return JSON
+    return response.json()
+
+
+def get_steam_app_id(app_name, steam_apps):
+    """
+    Get a Steam app ID from a Steam app name
+    :param app_name: The name of the app
+    :param steam_apps: A list of steam apps. Most likely this was generated by the function 'get_all_app_ids_and_names'.
+    :return: The corresponding Steam app ID as an integer.
+    """
+    app_id = None
+    for app in steam_apps:
+        if app["name"].lower() != app_name.lower():
+            continue
+        else:
+            app_id = app["appid"]
+            break
+
+    if app_id is not None:
+        return app_id
+
+    raise RuntimeError("No corresponding app id could be found. Please check the spelling of the Steam App name and "
+                       "try again.")
