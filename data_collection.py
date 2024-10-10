@@ -2,6 +2,8 @@ from pathlib import Path
 import requests
 import json
 import config
+import re
+import os
 
 
 def raise_api_error(function_name: str, status_code, reason):
@@ -124,3 +126,31 @@ def get_steam_app_id(app_name, steam_apps):
 
     raise RuntimeError("No corresponding app id could be found. Please check the spelling of the Steam App name and "
                        "try again.")
+
+
+
+def extract_and_save_image_links(text_data, output_file):
+    """
+    Extract image links from the provided text data and save them to a JSON file.
+    Parameters:
+    - text_data (str): The data containing potential image links.
+    - output_file (str): The name of the output JSON file to save the image links.
+    """
+    if isinstance(text_data, dict):
+        text_data = json.dumps(text_data)
+    
+    # Check if the output file already exists
+    if os.path.exists(output_file):
+        print(f"Output file '{output_file}' already exists. Please choose a different file name.")
+        return
+    
+    # Regex pattern for matching image URLs
+    image_pattern = r'https?://[^\s]+(?:\.jpg|\.jpeg|\.png|\.gif|\.bmp|\.tiff|\.webp|\.svg)'
+    image_links = re.findall(image_pattern, text_data, re.IGNORECASE)
+    unique_image_links = list(set(image_links))
+    images_data = {"image_links": unique_image_links}
+    
+    # Save the extracted image links to a new JSON file
+    with open(output_file, 'w', encoding='utf-8') as output:
+        json.dump(images_data, output, indent=4)
+    print(f"Image links extracted: {len(unique_image_links)} found and saved to '{output_file}'.")
