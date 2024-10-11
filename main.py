@@ -15,7 +15,10 @@ data_processing.create_csv_of_apps()
 
 # Get Hollow Knight's details and reviews. Print them to the console.
 print("App details: ", data_collection.get_app_details(hk, print_endpoint=True))
+# with open("test.html", "w") as f:
+#     f.write(details)
 print("\n")
 print("App user reviews: ", data_collection.get_app_reviews(hk, print_endpoint=True))
 print("\n")
-data_collection.extract_and_save_image_links(data_collection.get_app_details(hk, print_endpoint=True),'data/TEST_HOLLOWKNIGHT_image_urls.csv')
+data_collection.extract_and_save_image_links(data_collection.get_app_details(hk, print_endpoint=True),
+                                             'data/TEST_HOLLOWKNIGHT_vvideo_urls.json')

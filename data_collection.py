@@ -140,12 +140,13 @@ def extract_and_save_image_links(text_data, output_file):
         text_data = json.dumps(text_data)
     
     # Check if the output file already exists
-    if os.path.exists(output_file):
-        print(f"Output file '{output_file}' already exists. Please choose a different file name.")
-        return
+    # if os.path.exists(output_file):
+    #     print(f"Output file '{output_file}' already exists. Please choose a different file name.")
+    #     return
     
     # Regex pattern for matching image URLs
     image_pattern = r'https?://[^\s]+(?:\.jpg|\.jpeg|\.png|\.gif|\.bmp|\.tiff|\.webp|\.svg)'
+    # image_pattern = r'https?://[^\s]+(?:\.mp4)'
     image_links = re.findall(image_pattern, text_data, re.IGNORECASE)
     unique_image_links = list(set(image_links))
     images_data = {"image_links": unique_image_links}
