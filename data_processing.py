@@ -14,7 +14,7 @@ def create_csv_of_apps(steam_apps: list=None, block_size=1000, overwrite_file=Fa
     """
     # If file already exists, and overwrite_file is False, do nothing
     if Path(config.STEAM_APP_CSV_DATA).is_file() and not overwrite_file:
-        print("File already exists. To overwrite, set 'overwrite_file' to 'False'.")
+        print("File already exists. To overwrite, set 'overwrite_file' to 'True'.")
         return
 
     # Check for file or list

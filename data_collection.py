@@ -1,9 +1,12 @@
 from pathlib import Path
+from urllib.parse import quote
+
 import requests
 import json
 import config
 import re
 import os
+import numpy as np
 
 
 def raise_api_error(function_name: str, status_code, reason):
@@ -78,33 +81,84 @@ def get_app_details(appid: str or int, print_endpoint: bool=False):
         print(response.url)
 
     # Throw error if the status code is not 200
-    if response.status_code != 200:
+    if response.status_code == 429:
+        print("TOO MANY API REQUESTS")
+        raise_api_error("get_app_details", response.status_code, response.reason)
+    elif response.status_code != 200:
         raise_api_error("get_app_details", response.status_code, response.reason)
 
     # Return the JSON information
-    return response.json()[str(appid)]['data']
+    try:
+        return response.json()[str(appid)]['data']
+    except KeyError:
+        return None
 
 
-def get_app_reviews(appid: str or int, print_endpoint: bool=False):
+def get_app_reviews(appid: str or int, print_endpoint: bool=False, cursor="*", aggregate_app_review_data=None,
+                    report_threshold=1000):
     """
     Get the reviews for a single app.
     See https://github.com/Revadike/InternalSteamWebAPI/wiki/Get-App-Reviews
+    :param report_threshold: Do not use
     :param appid: A single Steam AppID as an integer or a string
     :param print_endpoint: if True, print the API endpoint used in the request
+    :param cursor: Cursor returned by previous calls
+    :param aggregate_app_review_data: Dictionary with the following structure: {
+        query_summary: dict
+        reviews: list
+    }
     :return: App details in JSON format
     """
+    # Allocate memory
+    if aggregate_app_review_data is not None:
+        app_review_data = aggregate_app_review_data
+    else:
+        app_review_data = {
+            "query_summary": {},
+            "reviews": []
+        }
+
     # Get the response and optionally print the full API endpoint
-    response = requests.get(f"https://store.steampowered.com/appreviews/{appid}?json=1")
+    cur = quote(cursor)
+    response = requests.get(f"https://store.steampowered.com/appreviews/{appid}?json=1&num_per_page=100&cursor={cur}")
     if print_endpoint:
         print(response.url)
+
+
+    test = [
+        {
+            "appid": "id",
+            "reviews": []
+        },
+    ]
 
     # Check status code. Raise error if status code is not 200
     if response.status_code != 200:
         raise_api_error("get_app_reviews", response.status_code, response.reason)
 
-    # Return JSON
-    return response.json()
+    json_data = response.json()
 
+    if cursor == "*":
+        app_review_data["query_summary"] = json_data["query_summary"]
+
+    # Get important parts of the json
+    reviews = json_data["reviews"]
+    cursor = json_data["cursor"]
+
+    # save to dictionary
+    app_review_data["reviews"] = app_review_data["reviews"] + reviews
+    num_reviews = len(app_review_data["reviews"])
+    total_reviews = app_review_data["query_summary"]["total_reviews"]
+
+    return app_review_data
+
+    # if num_reviews < total_reviews:
+    #     if num_reviews > report_threshold:
+    #         print(f"App {appid} review progress:", f"{np.round(100 * num_reviews / total_reviews, 2)}%")
+    #         report_threshold += 1000
+    #     return get_app_reviews(appid, False, cursor, app_review_data, report_threshold)
+    # else:
+    #     return app_review_data
 
 def get_steam_app_id(app_name, steam_apps):
     """
@@ -151,7 +205,7 @@ def extract_and_save_image_links(text_data, output_file):
     unique_image_links = list(set(image_links))
     images_data = {"image_links": unique_image_links}
     
-    # Save the extracted image links to a new JSON file
+    # Save the extracted image links to a new JSON file/home/daniel-ethridge/Documents/phd/machine-learning/MachineLearning/unsynced-data
     with open(output_file, 'w', encoding='utf-8') as output:
         json.dump(images_data, output, indent=4)
     print(f"Image links extracted: {len(unique_image_links)} found and saved to '{output_file}'.")
