@@ -7,6 +7,7 @@ import config
 import re
 import os
 import numpy as np
+import time
 
 
 def raise_api_error(function_name: str, status_code, reason):
@@ -60,7 +61,7 @@ def get_all_app_ids_and_names(print_endpoint: bool=False,
     return response.json()["applist"]["apps"]
 
 
-def get_app_details(appid: str or int, print_endpoint: bool=False):
+def get_app_details(appid: str or int, print_endpoint: bool=False, num_api_calls=None):
     """
     Get the details about a single app in a dictionary. Dictionary keys returned:
     ['type', 'name', 'steam_appid', 'required_age', 'is_free', 'controller_support', 'dlc', 'detailed_description',
@@ -77,21 +78,24 @@ def get_app_details(appid: str or int, print_endpoint: bool=False):
     # Set parameters, make api call, and optionally print the endpoing
     parameters = {"appids": appid}
     response = requests.get("https://store.steampowered.com/api/appdetails", params=parameters)
+    num_api_calls += 1
     if print_endpoint:
         print(response.url)
 
     # Throw error if the status code is not 200
     if response.status_code == 429:
         print("TOO MANY API REQUESTS")
+        print("Num API calls:", num_api_calls)
         raise_api_error("get_app_details", response.status_code, response.reason)
     elif response.status_code != 200:
+        print("Num API calls:", num_api_calls)
         raise_api_error("get_app_details", response.status_code, response.reason)
 
     # Return the JSON information
     try:
-        return response.json()[str(appid)]['data']
+        return response.json()[str(appid)]['data'], num_api_calls
     except KeyError:
-        return None
+        return None, num_api_calls
 
 
 def get_app_reviews(appid: str or int, print_endpoint: bool=False, cursor="*", aggregate_app_review_data=None,
@@ -124,14 +128,6 @@ def get_app_reviews(appid: str or int, print_endpoint: bool=False, cursor="*", a
     if print_endpoint:
         print(response.url)
 
-
-    test = [
-        {
-            "appid": "id",
-            "reviews": []
-        },
-    ]
-
     # Check status code. Raise error if status code is not 200
     if response.status_code != 200:
         raise_api_error("get_app_reviews", response.status_code, response.reason)
@@ -150,15 +146,14 @@ def get_app_reviews(appid: str or int, print_endpoint: bool=False, cursor="*", a
     num_reviews = len(app_review_data["reviews"])
     total_reviews = app_review_data["query_summary"]["total_reviews"]
 
-    return app_review_data
-
-    # if num_reviews < total_reviews:
-    #     if num_reviews > report_threshold:
-    #         print(f"App {appid} review progress:", f"{np.round(100 * num_reviews / total_reviews, 2)}%")
-    #         report_threshold += 1000
-    #     return get_app_reviews(appid, False, cursor, app_review_data, report_threshold)
-    # else:
-    #     return app_review_data
+    if num_reviews < total_reviews:
+        if num_reviews > report_threshold:
+            print(f"App {appid} review progress:", f"{np.round(100 * num_reviews / total_reviews, 2)}%")
+            report_threshold += 1000
+        time.sleep(1)
+        return get_app_reviews(appid, False, cursor, app_review_data, report_threshold)
+    else:
+        return app_review_data
 
 def get_steam_app_id(app_name, steam_apps):
     """
