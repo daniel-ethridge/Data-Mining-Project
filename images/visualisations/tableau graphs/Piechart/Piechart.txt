@@ -1,0 +1,5 @@
+Explanation - 
+The pie chart shows the app types like game, demo, dlc, etc vs the total number of games.
+
+Observations- 
+We can observe that the game app type is most common followed by dlc and music.

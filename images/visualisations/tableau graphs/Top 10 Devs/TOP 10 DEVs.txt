@@ -1,0 +1,9 @@
+Cleaning process - 
+1. Cleaned to find top 10 devs using number of positive reviews
+
+Explanation - 
+X axis is the top 10 game developers based on positive user reviews.
+Y axis is the total reviews received by each developer.
+
+Observation - 
+We can see that capcom co has the highest reviews and is followed by dice , but there is a huge difference between the two. We can see that BioWare is the most positively reviewed developer

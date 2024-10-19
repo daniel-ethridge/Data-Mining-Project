@@ -1,0 +1,9 @@
+Cleaning process - 
+1. Cleaned to find top 10 publishers using number of positive reviews
+
+Explanation - 
+X axis has the names of the top 10 publisher names, which were found using the most positive reviews. Y axis has the total number of reviews.
+
+Observation - 
+This graph shows the top 10 publisher names, and that electronic arts has the highest number of reviews, and arc system works has the highest number of positive reviews.
+

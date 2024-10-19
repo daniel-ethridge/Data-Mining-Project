@@ -1,0 +1,8 @@
+Cleaning process - 
+1. Cleaned to find worst 10 devs using number of negative reviews
+
+Explanation - 
+The x axis is the top 10 most negatively review game developers and y axis is the total positive and negative reviews.
+
+Observations - 
+We can see that rare ltd and DICE are the two most negatively reviewed game developers and that most developers have almost nearly equal positive reviews as well.

@@ -1,0 +1,10 @@
+Cleaning process - 
+1. Cleaned to find top 5 genres using number of positive reviews
+2. Had to seperate each game genre into separate tables as each game had multiple genres.
+
+Explanation - 
+X axis has the names of the top 5 game genres, which were found using the most positive reviews.
+Y axis has the total number of reviews.
+
+Observation - 
+This graph shows the top 5 genre names, and that action is the most liked game genre and these have very little negative reviews. 

@@ -1,0 +1,10 @@
+Cleaning process - 
+1. cleaned null values from price and steam_id
+2. Cleaned price to be just numbers and removed outliers
+3. Cleaned price to be in usd (changed based on price currency)
+
+Explanation - 
+The graph plots total number of reviews for each price range of each game. Red are net negatively reviewed games and green and net positively reviewed games. We have removed outliers to make the graph more digestible.
+
+Observations- 
+We can see that most games are positively reviewed, only a few are negatively reviewed. This mean the data is more skewed towards positive reviews. We can also observe that the data is more concentrated towards the left end, meaning games tend to be less pricey. But on the y axis the total reviews are quite equally spread apart, meaning there is no visible trend with games and number of reviews.

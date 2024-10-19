@@ -100,9 +100,6 @@ def get_app_details(appid: str or int, print_endpoint: bool=False, num_api_calls
         raise_api_warning("get_app_details", response.status_code, response.reason)
         return False, num_api_calls
 
-    with open("jsondata.json", "w") as f:
-        json.dump(response.json(), f)
-
     # Return the JSON information
     try:
         return response.json()[str(appid)]['data'], num_api_calls
