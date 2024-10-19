@@ -22,3 +22,4 @@ This project involves performing an in-depth analysis of game data using the Ste
 
 ## link to data
 - [dropbox](https://www.dropbox.com/scl/fo/iqhhchbvihrlaz7n5w990/ADFF-wuR_qxiriHcHGRsVxY?rlkey=skz2ac2uzl1iggzurdimf8ajv&st=blvz8vmv&dl=0)
+- [Google Drive](https://drive.google.com/drive/u/1/folders/1h-dvH1eJONUQM4EXvuL2Fwa4Ar9GHHXN)
