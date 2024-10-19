@@ -1,5 +1,5 @@
 # Data Mining Project (CSCI 5502)
-Project for CU Boulder Data Mining class. Fall 2024
+Project for CU Boulder Data Mining class. Fall 2024. Daniel Ethridge, Atharva Patil, Deep Shukla, Sujith Battu.
 
 # Overview
 This project involves performing an in-depth analysis of game data using the Steam API. We have gathered data on game names, images, trailers, user reviews, and other relevant information.
