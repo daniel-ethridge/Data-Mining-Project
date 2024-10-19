@@ -3,3 +3,14 @@ data/*
 .idea/*
 __pycache__/*
 api-key.txt
+.ipynb_checkpoints
+backup/*
+count.py
+scratch.py
+run_scratch.sh
+run_main.sh
+jsondata.json
+ended.txt
+data-collection-data.csv
+last_run.txt
+progress.txt
