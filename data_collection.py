@@ -1,5 +1,6 @@
 from asyncio import timeout
 from datetime import datetime
+from json import JSONDecodeError
 from pathlib import Path
 from urllib.parse import quote
 
@@ -104,6 +105,8 @@ def get_app_details(appid: str or int, print_endpoint: bool=False, num_api_calls
     try:
         return response.json()[str(appid)]['data'], num_api_calls
     except KeyError:
+        return None, num_api_calls
+    except JSONDecodeError:
         return None, num_api_calls
 
 

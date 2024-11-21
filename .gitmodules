@@ -1,0 +1,3 @@
+[submodule "DataMiningProjectData"]
+	path = DataMiningProjectData
+	url = git@github.com:daniel-ethridge/DataMiningProjectData.git
